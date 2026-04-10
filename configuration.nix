@@ -15,12 +15,13 @@ services.xserver = {
     xkb.layout = "us,eg";
     xkb.options = "grp:caps_toggle";
 };
+services.displayManager.ly.enable = true;
 
-sound.enable = true;
 services.pipewire = {
-enable = true;
-alsa.enable = true;
-pulse.enable = true;
+    enable = true;
+    alsa.enable = true;
+    pulse.enable = true;
+    wireplumber.enable = true;
 };
 
 
@@ -34,11 +35,9 @@ environment.systemPackages = with pkgs; [
     alacritty tmux neovim
     dmenu rofi dunst picom
     brave pcmanfm telegram-desktop
-    yt-dlp playerctl
-    wireplumber
-    git curl wget ripgrep
+    yt-dlp git
+    curl wget ripgrep
     gum pv boxes
-    pkgs-unstable.oxwm
 ];
 
 
