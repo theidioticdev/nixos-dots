@@ -1,5 +1,5 @@
 {
-  Description = "oxwm on nixos, btw";
+  description = "oxwm on nixos, btw";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -20,12 +20,6 @@
       modules = [
         ./configuration.nix
         oxwm.nixosModules.default
-        {
-          services.xserver = {
-            enable = true;
-            windowManager.oxwm.enable = true;
-          };
-        }
       ];
     };
   };
