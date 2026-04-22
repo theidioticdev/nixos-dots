@@ -3,12 +3,8 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
-    oxwm = {
-      url = "github:tonybanters/oxwm";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
   };
-  outputs = { self, nixpkgs, nixpkgs-unstable, oxwm, ... }: {
+  outputs = { self, nixpkgs, nixpkgs-unstable,... }: {
     nixosConfigurations.nixos-btw = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = {
@@ -19,7 +15,6 @@
       };
       modules = [
         ./configuration.nix
-        oxwm.nixosModules.default
       ];
     };
   };

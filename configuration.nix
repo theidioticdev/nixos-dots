@@ -1,77 +1,123 @@
-{ config, pkgs, pkgs-unstable, ... }:
+{ config, pkgs, ... }:
 
 {
-imports = [
-  ./hardware-configuration.nix
-];
-
-
-hardware.graphics = {
-  enable = true;
-  extraPackages = with pkgs; [
-    intel-media-driver
-    intel-vaapi-driver
-    libvdpau-va-gl
+  imports = [
+    ./hardware-configuration.nix
   ];
-};
 
-services.tlp.enable = true;
+  # --- Bootloader (GRUB for EFI) ---
+  boot.loader = {
+    efi = {
+      canTouchEfiVariables = true;
+      efiSysMountPoint = "/boot"; # Change to /boot/efi if your hardware-config says so
+    };
+    grub = {
+      enable = true;
+      device = "nodev";
+      efiSupport = true;
+      useOSProber = true;
+      configurationLimit = 10; # Prevents GRUB from becoming a wall of text
+    };
+    systemd-boot.enable = false;
+  };
 
-boot.loader.systemd-boot.enable = true;
-boot.loader.efi.canTouchEfiVariables = true;
+  # --- Storage Optimization (Crucial for 256GB) ---
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 7d";
+  };
+  nix.settings.auto-optimise-store = true; # Deduplicates files to save space
 
-networking.hostName = "nixos-btw";
-networking.networkmanager.enable = true;
+  # --- Hardware & Graphics ---
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver
+      intel-vaapi-driver
+      libvdpau-va-gl
+    ];
+  };
 
-time.timeZone = "Africa/Cairo";
-i18n.defaultLocale = "en_US.UTF-8";
+  hardware.sane = {
+    enable = true;
+    extraBackends = [ pkgs.epsonscan2 ];
+  };
 
-services.xserver = {
+  services.tlp.enable = true;
+
+  # --- Networking & Localization ---
+  networking.hostName = "nixos-btw";
+  networking.networkmanager.enable = true;
+  time.timeZone = "Africa/Cairo";
+  i18n.defaultLocale = "en_US.UTF-8";
+
+  # --- Services ---
+  services.printing = {
+    enable = true;
+    drivers = [ pkgs.epson-escpr ]; # Your L3150 Driver
+  };
+
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+  };
+
+  services.xserver = {
     enable = true;
     xkb.layout = "us,eg";
     xkb.options = "grp:caps_toggle";
-    windowManager.oxwm.enable = true;
-};
-services.displayManager.ly.enable = true;
+  };
 
-services.picom = {
-    enable = true;
-};
-services.pipewire = {
+  services.displayManager.ly.enable = true;
+
+  services.pipewire = {
     enable = true;
     alsa.enable = true;
     pulse.enable = true;
     wireplumber.enable = true;
-};
-
-services.libinput = {
-  enable = true;
-  touchpad = {
-    tapping = true;
-    naturalScrolling = true;
   };
-};
 
-users.users.mostafa = {
+  services.libinput = {
+    enable = true;
+    touchpad = {
+      tapping = true;
+      naturalScrolling = true;
+    };
+  };
+
+  # --- User Space ---
+  users.users.mostafa = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" ];
+    extraGroups = [ "wheel" "networkmanager" "lp" "scanner" ];
     shell = pkgs.zsh;
-};
+  };
+  
+  programs.zsh.enable = true;
 
-environment.systemPackages = with pkgs; [
-    alacritty tmux neovim
-    dmenu rofi dunst
-    brave pcmanfm telegram-desktop
-    yt-dlp git
-    curl wget ripgrep
-    gum pv boxes
-];
-fonts.packages = with pkgs; [
-    nerd-fonts.iosevka
-];
+  environment.systemPackages = with pkgs; [
+    # System Essentials
+    foot tmux vim git curl wget ripgrep
+    unzip zip file wl-clipboard
+    
+    # Wayland / MangoWM stack
+    mangowc
+    fuzzel mako waybar
+    grim slurp
+    
+    # Apps
+    brave pcmanfm yt-dlp
+    epsonscan2
+  ];
 
-programs.zsh.enable = true;
-    nix.settings.experimental-features = [ "nix-command" "flakes" ];
-    nixpkgs.config.allowUnfree = true; 
-system.stateVersion = "25.11"; 
+  fonts.packages = with pkgs; [
+    nerd-fonts.jetbrains-mono
+  ];
+
+  # --- Nix System Settings ---
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nixpkgs.config.allowUnfree = true; 
+
+  system.stateVersion = "25.11"; 
 }
