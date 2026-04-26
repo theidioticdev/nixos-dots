@@ -1,27 +1,25 @@
-{ config, pkgs, ... }:
+{ config, pkgs, unstable, ... }:
 
 {
   imports = [
     ./hardware-configuration.nix
   ];
 
-  # --- Bootloader (GRUB for EFI) ---
   boot.loader = {
     efi = {
       canTouchEfiVariables = true;
-      efiSysMountPoint = "/boot"; # Change to /boot/efi if your hardware-config says so
+      efiSysMountPoint = "/boot";
     };
     grub = {
       enable = true;
       device = "nodev";
       efiSupport = true;
       useOSProber = true;
-      configurationLimit = 10; # Prevents GRUB from becoming a wall of text
+      configurationLimit = 10;
     };
     systemd-boot.enable = false;
   };
 
-  # --- Storage Optimization (Crucial for 256GB) ---
   nix.gc = {
     automatic = true;
     dates = "weekly";
@@ -29,7 +27,6 @@
   };
   nix.settings.auto-optimise-store = true; # Deduplicates files to save space
 
-  # --- Hardware & Graphics ---
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
@@ -46,16 +43,14 @@
 
   services.tlp.enable = true;
 
-  # --- Networking & Localization ---
   networking.hostName = "nixos-btw";
   networking.networkmanager.enable = true;
   time.timeZone = "Africa/Cairo";
   i18n.defaultLocale = "en_US.UTF-8";
 
-  # --- Services ---
   services.printing = {
     enable = true;
-    drivers = [ pkgs.epson-escpr ]; # Your L3150 Driver
+    drivers = [ pkgs.epson-escpr2 ];
   };
 
   services.avahi = {
@@ -66,8 +61,11 @@
 
   services.xserver = {
     enable = true;
+    windowManager.oxwm.enable = true;
     xkb.layout = "us,eg";
     xkb.options = "grp:caps_toggle";
+    autoRepeatRate = "35";
+    autoRepeatDelay = "300";
   };
 
   services.displayManager.ly.enable = true;
@@ -87,35 +85,27 @@
     };
   };
 
-  # --- User Space ---
   users.users.mostafa = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" "lp" "scanner" ];
-    shell = pkgs.zsh;
+    shell = pkgs.bash;
   };
   
-  programs.zsh.enable = true;
+  programs.bash.enable = true;
 
   environment.systemPackages = with pkgs; [
-    # System Essentials
-    foot tmux vim git curl wget ripgrep
-    unzip zip file wl-clipboard
-    
-    # Wayland / MangoWM stack
-    mangowc
-    fuzzel mako waybar
-    grim slurp
-    
-    # Apps
+    tmux alacritty git curl wget ripgrep
+    unzip zip file xclip neovim
+    maim fd gcc gnumake
     brave pcmanfm yt-dlp
-    epsonscan2
   ];
+
+nixpkgs.config.allowUnfree = true;
 
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
   ];
 
-  # --- Nix System Settings ---
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nixpkgs.config.allowUnfree = true; 
 
