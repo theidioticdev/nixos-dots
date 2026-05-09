@@ -1,4 +1,4 @@
-{ config, pkgs, unstable, ... }:
+{ config, pkgs,  ... }:
 
 {
   imports = [
@@ -25,16 +25,13 @@
     dates = "weekly";
     options = "--delete-older-than 7d";
   };
-  nix.settings.auto-optimise-store = true; # Deduplicates files to save space
 
   hardware.graphics = {
     enable = true;
-    extraPackages = with pkgs; [
-      intel-media-driver
-      intel-vaapi-driver
-      libvdpau-va-gl
-    ];
   };
+
+  hardware.cpu.intel.updateMicrocode = true;
+  hardware.enableRedistributableFirmware = true;
 
   hardware.sane = {
     enable = true;
@@ -61,11 +58,11 @@
 
   services.xserver = {
     enable = true;
-    windowManager.oxwm.enable = true;
+    windowManager.i3.enable = true;
     xkb.layout = "us,eg";
     xkb.options = "grp:caps_toggle";
-    autoRepeatRate = "35";
-    autoRepeatDelay = "300";
+    autoRepeatRate = 35;
+    autoRepeatDelay = 300;
   };
 
   services.displayManager.ly.enable = true;
@@ -91,22 +88,22 @@
     shell = pkgs.bash;
   };
   
-  programs.bash.enable = true;
+  programs = {
+    bash.enable = true
+  };
 
   environment.systemPackages = with pkgs; [
     tmux alacritty git curl wget ripgrep
-    unzip zip file xclip neovim
-    maim fd gcc gnumake
-    brave pcmanfm yt-dlp
+    unzip zip file xclip neovim  maim
+    brave pcmanfm yt-dlp mangowc
   ];
 
-nixpkgs.config.allowUnfree = true;
 
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
   ];
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [ "nix-command" ];
   nixpkgs.config.allowUnfree = true; 
 
   system.stateVersion = "25.11"; 

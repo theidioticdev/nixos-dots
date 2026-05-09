@@ -1,0 +1,182 @@
+# i3 config
+# appearence
+set $mod Mod4
+set $terminal st
+
+# appearence 
+set $fg           #cdd6f4
+set $bg           #1e1e2e
+set $cyan         #89dceb
+set $purple       #cba6f7
+set $green        #a6e3a1
+set $blue         #89b4fa
+set $sep          #585b70
+set $red          #f38ba8
+set $rosewater    #f5e0dc
+set $surface1     #45475a
+
+default_border          pixel 2
+default_floating_border pixel 2
+
+client.focused          $cyan    $bg           $fg   $purple      $purple
+client.unfocused        $sep     $bg           $fg   $sep         $sep
+client.focused_inactive $sep     $bg           $fg   $sep         $sep
+client.urgent           $red     $bg           $fg   $red         $red
+
+gaps inner 0
+gaps outer 0
+
+# autostart
+exec_always --no-startup-id xset r rate 300 35
+exec --no-startup-id xwallpaper --zoom /home/mostafa/dotfiles/walls/catppuccin/error.png
+exec --no-startup-id dunst
+exec --no-startup-id greenclip daemon &
+exec --no-startup-id xss-lock -- betterlockscreen -l
+
+# float rules
+for_window [instance="floating"]         floating enable
+for_window [instance="gimp"]             floating enable
+for_window [instance="Godot_Editor"]     floating enable
+for_window [instance="blueman-manager"]  floating enable
+for_window [instance="nmgui"]            floating enable
+
+# ws def
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+
+# ws rules
+assign [instance="brave-origin-beta"]   $ws2
+assign [instance="music"]               $ws3
+assign [instance="Telegram"]            $ws5
+assign [instance="connect"]             $ws6
+assign [instance="libreoffice"]         $ws6
+assign [instance="Terraria.bin.x86_64"] $ws8
+assign [instance="itch"]                $ws8
+assign [instance="uzdoom"]              $ws8
+assign [instance="pcmanfm"]             $ws9
+
+# apps
+bindsym $mod+Return         exec $terminal
+bindsym $mod+d              exec rofi -show drun
+bindsym $mod+b              exec brave-origin-beta
+bindsym $mod+shift+b        exec blueman-manager
+bindsym $mod+e              exec pcmanfm
+bindsym $mod+s              exec sh -c 'maim -s | xclip -selection clipboard -t image/png'
+
+bindsym $mod+v exec rofi -modi "clipboard:greenclip print" -show clipboard
+
+bindsym $mod+shift+l        exec betterlockscreen -l
+
+# wm controls
+
+bindsym $mod+q              kill
+bindsym $mod+shift+f        fullscreen toggle
+bindsym $mod+shift+space    floating toggle
+
+bindsym $mod+n              layout toggle splith splitv tabbed stacking
+bindsym $mod+Down           focus down
+bindsym $mod+Up             focus up
+bindsym $mod+Left           focus left
+bindsym $mod+Right          focus right
+
+bindsym $mod+shift+Down     move down
+bindsym $mod+shift+Up       move up
+bindsym $mod+shift+Left     move left
+bindsym $mod+shift+Right    move right
+
+mode "resize" {
+    bindsym Left  resize shrink width  5 px or 5 ppt
+    bindsym Right resize grow   width  5 px or 5 ppt
+    bindsym Down  resize shrink height 5 px or 5 ppt
+    bindsym Up    resize grow   height 5 px or 5 ppt
+
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+    bindsym $mod+r mode "default"
+}
+bindsym $mod+r mode "resize"
+
+bindsym $mod+shift+q        exit
+bindsym $mod+shift+r        restart
+
+# monitor binds
+bindsym $mod+comma          focus output left
+bindsym $mod+period         focus output right
+bindsym $mod+shift+comma    move workspace to output left
+bindsym $mod+shift+period   move workspace to output right
+
+# go to ws
+bindsym $mod+1              workspace $ws1
+bindsym $mod+2              workspace $ws2
+bindsym $mod+3              workspace $ws3
+bindsym $mod+4              workspace $ws4
+bindsym $mod+5              workspace $ws5
+bindsym $mod+6              workspace $ws6
+bindsym $mod+7              workspace $ws7
+bindsym $mod+8              workspace $ws8
+bindsym $mod+9              workspace $ws9
+
+# move to ws
+bindsym $mod+shift+1        move container to workspace $ws1
+bindsym $mod+shift+2        move container to workspace $ws2
+bindsym $mod+shift+3        move container to workspace $ws3
+bindsym $mod+shift+4        move container to workspace $ws4
+bindsym $mod+shift+5        move container to workspace $ws5
+bindsym $mod+shift+6        move container to workspace $ws6
+bindsym $mod+shift+7        move container to workspace $ws7
+bindsym $mod+shift+8        move container to workspace $ws8
+bindsym $mod+shift+9        move container to workspace $ws9
+
+# media binds
+bindsym F3 exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+bindsym F2 exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+bindsym F1 exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+bindsym F4 exec playerctl play-pause
+bindsym F5 exec playerctl previous
+bindsym F6 exec playerctl next
+bindsym F7 exec playerctl stop
+
+# launcher mode, like emacs/vim key chords
+mode "launcher" {
+    bindsym m exec st -c music -e mocp                mode "default"
+    bindsym n exec nmgui                              mode "default"
+    bindsym s exec Telegram                           mode "default"
+
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+    bindsym $mod+space mode "default"
+}
+bindsym $mod+space mode "launcher"
+
+
+# bar config
+bar {
+    status_command i3status
+
+    position top
+
+    font pango:JetBrainsMono Nerd Font SemiBold 14
+
+colors {
+        background #1e1e2e
+        statusline #cdd6f4
+        separator  #585b70
+
+        #                  BORDER  BG      TEXT
+        focused_workspace  #89b4fa #89b4fa #11111b
+        active_workspace   #45475a #45475a #cdd6f4
+        inactive_workspace #1e1e2e #1e1e2e #a6adc8
+        urgent_workspace   #f38ba8 #f38ba8 #11111b
+    }
+}
+
+floating_modifier $mod
+bindsym $mod+button2 kill
+bindsym $mod+button3 floating toggle

@@ -1,0 +1,32 @@
+general {
+        colors = true
+        interval = 5
+        output_format = "i3bar"
+}
+
+order += "disk /"
+order += "memory"
+order += "battery all"
+order += "tztime local"
+
+disk "/" {
+    format = " 󰋊 %used/%total "
+}
+
+memory {
+    format = " 󰍛 %used/%total "
+}
+
+battery all {
+        format = "󰁹 %percentage"
+        separator_block_width = 25
+        format_down = "No battery"
+        last_full_capacity = true
+        integer_battery_capacity = true
+        low_threshold = 15
+        threshold_type = percentage
+}
+
+tztime local {
+    format = "󰃭 %a, %b %d - 󱑒 %-I:%M %P"
+}
